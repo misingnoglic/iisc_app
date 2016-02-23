@@ -19,6 +19,9 @@ class Professor(models.Model):
     fiducial_number = models.IntegerField()
     description = models.TextField()
 
+    def __unicode__(self):
+        return self.name
+
 class Lab(models.Model):
     pi = models.ForeignKey(Professor)
     room = models.IntegerField()
