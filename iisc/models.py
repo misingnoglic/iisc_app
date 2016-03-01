@@ -5,11 +5,16 @@ from django.contrib.auth.models import User
 from django.apps import apps
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
+from django.utils.functional import cached_property
 
 
 class FidType(models.Model):
     fiducial_number = models.IntegerField(unique=True)
     model_type = models.CharField(max_length=50)
+
+    def __unicode__(self):
+        return unicode(self.fiducial_number)
+
 
 class FiducialObject(models.Model):
 
@@ -17,6 +22,14 @@ class FiducialObject(models.Model):
 
     class Meta:
         abstract = True
+
+    def rating(self):
+        ratings = Rating.objects.filter(fiducial__fiducial_number=self.fiducial_number)
+        if ratings:
+            return sum([r.rating for r in ratings])/len(ratings)
+        else:
+            return 0
+
 
     def save(self, *args, **kwargs):
         # If it's being created for the first time - check to make sure the fn doesn't exist
@@ -82,4 +95,14 @@ class Lab(FiducialObject):
     def __unicode__(self):
         return self.name
 
-#class Participant(models.Model):
+class Participant(models.Model):
+    email = models.EmailField(unique=True)
+    name = models.CharField(max_length=40)
+
+class Rating(models.Model):
+    person = models.ForeignKey(Participant)
+    fiducial = models.ForeignKey(FidType)
+    rating = models.IntegerField()
+
+    class Meta:
+        unique_together = (("person", "fiducial"),)
