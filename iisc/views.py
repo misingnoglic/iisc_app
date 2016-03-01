@@ -59,4 +59,11 @@ def register(request):
         else:
             p = Participant.objects.create(email=email, name=name)
             p.save()
-        return HttpResponse(json.dumps({'success':'True','UserID':p.pk}), content_type="application/json")
+        return HttpResponse(json.dumps({'success': 'True','UserID':p.pk}), content_type="application/json")
+
+
+def save_fid(request,user_id, fn):
+    user = Participant.objects.get(pk=user_id)
+    user.saved.add(FidType.objects.get(fiducial_number=fn))
+    user.save()
+    return HttpResponse(json.dumps({'success': 'True'}), content_type="application/json")

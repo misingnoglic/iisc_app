@@ -98,6 +98,7 @@ class Lab(FiducialObject):
 class Participant(models.Model):
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=40)
+    saved = models.ManyToManyField(FidType)
 
 class Rating(models.Model):
     person = models.ForeignKey(Participant)
