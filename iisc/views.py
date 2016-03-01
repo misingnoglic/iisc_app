@@ -5,6 +5,8 @@ from django.core import serializers
 from django.http import HttpResponse
 from django.apps import apps
 import json
+from django.views.decorators.csrf import csrf_exempt
+
 
 
 class ProfessorViewSet(viewsets.ModelViewSet):
@@ -30,24 +32,31 @@ def GetObjectFromFiducial(request, fn):
     data = json.dumps(j)
     return HttpResponse(data, content_type="application/json")
 
-def rate(request,email,fn,rating):
+
+@csrf_exempt
+def rate(request,user_id,fn,rating):
     try:
-        r = Rating.objects.get(person__email=email, fiducial__fiducial_number=fn)
+        r = Rating.objects.get(person__pk=user_id, fiducial__fiducial_number=fn)
         r.rating = rating
         r.save()
 
     except Rating.DoesNotExist:
-        r = Rating.objects.create(person = Participant.objects.get(email=email),
-                                  fiducial = FidType.objects.get(fiducial_number=fn),
-                                  rating = rating)
+        r = Rating.objects.create(person=Participant.objects.get(pk=user_id),
+                                  fiducial=FidType.objects.get(fiducial_number=fn),
+                                  rating=rating)
         r.save()
     return HttpResponse(json.dumps({'success':'True'}), content_type="application/json")
 
-def register(request,email,name):
-    if Participant.objects.filter(email=email).count() > 0:
-        #return HttpResponse(json.dumps({'success':'False', 'error':'Already Exists'}), content_type="application/json")
-        pass
-    else:
-        p = Participant.objects.create(email=email, name=name)
-        p.save()
-    return HttpResponse(json.dumps({'success':'True'}), content_type="application/json")
+@csrf_exempt
+def register(request):
+    if request.method == 'POST':
+        import pdb;pdb.set_trace()
+        email = request.POST["email"]
+        name = request.POST["name"]
+        if Participant.objects.filter(email=email).count() > 0:
+            p = Participant.objects.get(email=email)
+            return HttpResponse(json.dumps({'UserID':p.pk,'success':'False', 'error':'Already Exists'}), content_type="application/json")
+        else:
+            p = Participant.objects.create(email=email, name=name)
+            p.save()
+        return HttpResponse(json.dumps({'success':'True','UserID':p.pk}), content_type="application/json")
