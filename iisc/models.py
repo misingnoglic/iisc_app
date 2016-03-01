@@ -73,5 +73,7 @@ class Lab(FiducialObject):
     room = models.IntegerField()
     name = models.CharField(max_length=20)
     description = models.TextField()
+    faculty_photo = models.ImageField(upload_to="static/photos/", blank=True)
+    video = models.FileField(upload_to="static/photos/", blank=True)
 
 #class Participant(models.Model):
