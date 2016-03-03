@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+from __future__ import unicode_literals, division
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -29,7 +29,6 @@ class FiducialObject(models.Model):
             return sum([r.rating for r in ratings])/len(ratings)
         else:
             return 0
-
 
     def save(self, *args, **kwargs):
         # If it's being created for the first time - check to make sure the fn doesn't exist

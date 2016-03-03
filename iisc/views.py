@@ -50,7 +50,6 @@ def rate(request,user_id,fn,rating):
 @csrf_exempt
 def register(request):
     if request.method == 'POST':
-        import pdb;pdb.set_trace()
         email = request.POST["email"]
         name = request.POST["name"]
         if Participant.objects.filter(email=email).count() > 0:
