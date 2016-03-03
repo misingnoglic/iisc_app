@@ -70,6 +70,8 @@ class Event(FiducialObject):
     time = models.TimeField()
     description = models.TextField()
     votes = models.IntegerField()
+    def __unicode__(self):
+        return self.name
 
 
 class Professor(FiducialObject):
@@ -77,7 +79,6 @@ class Professor(FiducialObject):
     research_field = models.CharField(max_length=30)
     room = models.IntegerField()
     description = models.TextField()
-
 
     def __unicode__(self):
         return self.name
@@ -94,10 +95,15 @@ class Lab(FiducialObject):
     def __unicode__(self):
         return self.name
 
+
 class Participant(models.Model):
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=40)
     saved = models.ManyToManyField(FidType)
+
+    def __unicode__(self):
+        return self.name+" - "+self.email
+
 
 class Rating(models.Model):
     person = models.ForeignKey(Participant)
@@ -106,3 +112,6 @@ class Rating(models.Model):
 
     class Meta:
         unique_together = (("person", "fiducial"),)
+
+    def __unicode__(self):
+        return "%s rating %d %d" % (self.person.name, self.fiducial.fiducial_number, self.rating)
