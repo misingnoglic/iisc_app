@@ -10,6 +10,7 @@ from django.utils.functional import cached_property
 
 class FidType(models.Model):
     fiducial_number = models.IntegerField(unique=True)
+    name = models.CharField(max_length=20, unique=True)
     model_type = models.CharField(max_length=50)
 
     def __unicode__(self):
@@ -19,6 +20,8 @@ class FidType(models.Model):
 class FiducialObject(models.Model):
 
     fiducial_number = models.IntegerField(unique=True)
+    name = models.CharField(max_length=20, unique=True)
+    
 
     class Meta:
         abstract = True
@@ -52,7 +55,7 @@ class FiducialObject(models.Model):
                 raise duplicate_fn_error
 
         if not self.pk: # If it is created for the first time - save the record
-            record = FidType(fiducial_number=self.fiducial_number, model_type=self._meta.object_name)
+            record = FidType(fiducial_number=self.fiducial_number, model_type=self._meta.object_name, name = self.name)
             record.save()
         else:
             if old_fn != self.fiducial_number:  # If the fn is updated
@@ -66,7 +69,7 @@ class FiducialObject(models.Model):
 
 
 class Event(FiducialObject):
-    name = models.CharField(max_length=20)
+    
     time = models.TimeField()
     description = models.TextField()
     votes = models.IntegerField()
@@ -75,7 +78,6 @@ class Event(FiducialObject):
 
 
 class Professor(FiducialObject):
-    name = models.CharField(max_length=20)
     research_field = models.CharField(max_length=30)
     room = models.IntegerField()
     description = models.TextField()
@@ -85,10 +87,9 @@ class Professor(FiducialObject):
 
 
 class Lab(FiducialObject):
-    pi = models.ForeignKey(Professor)
-    room = models.IntegerField()
-    name = models.CharField(max_length=20)
-    description = models.TextField()
+    pi = models.ForeignKey(Professor, null=True, blank=True)
+    room = models.IntegerField(blank=True)
+    description = models.TextField(blank=True)
     faculty_photo = models.ImageField(upload_to="media/", blank=True)
     video = models.FileField(upload_to="media/", blank=True)
 

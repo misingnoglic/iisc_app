@@ -10,6 +10,6 @@ admin.site.register(Participant)
 
 @admin.register(FidType)
 class FidTypeAdmin(admin.ModelAdmin):
-    list_display = ('fiducial_number', 'model_type')
+    list_display = ('fiducial_number', 'model_type', 'name')
 
 

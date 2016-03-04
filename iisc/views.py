@@ -22,7 +22,8 @@ def ProfessorRaw(request, fn):
 
 
 def GetObjectFromFiducial(request, fn):
-    #import pdb;pdb.set_trace()
+    if isinstance(fn, unicode):
+        fn = FidType.objects.get(name=fn).fiducial_number
     obj_name = FidType.objects.get(fiducial_number=fn).model_type
     Model = apps.get_model(app_label="iisc", model_name=obj_name)
     obj = Model.objects.filter(fiducial_number=fn)
@@ -35,6 +36,8 @@ def GetObjectFromFiducial(request, fn):
 
 @csrf_exempt
 def rate(request,user_id,fn,rating):
+    if isinstance(fn, unicode):
+        fn = FidType.objects.get(name=fn).fiducial_number
     try:
         r = Rating.objects.get(person__pk=user_id, fiducial__fiducial_number=fn)
         r.rating = rating
@@ -62,6 +65,8 @@ def register(request):
 
 
 def save_fid(request,user_id, fn):
+    if isinstance(fn, unicode):
+        fn = FidType.objects.get(name=fn).fiducial_number
     user = Participant.objects.get(pk=user_id)
     user.saved.add(FidType.objects.get(fiducial_number=fn))
     user.save()
