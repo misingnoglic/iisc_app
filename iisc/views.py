@@ -1,4 +1,4 @@
-from .models import Professor, FidType, Rating, Participant
+from .models import Professor, FidType, Rating, Participant, FiducialObject
 from rest_framework import viewsets
 from .serializers import ProfessorSerializer
 from django.core import serializers
@@ -21,8 +21,8 @@ def ProfessorRaw(request, fn):
     return HttpResponse(data, content_type="application/json")
 
 
-def GetObjectFromFiducial(request, fn):
-    if isinstance(fn, unicode):
+def GetObjectFromFiducial(request, fn, string=False):
+    if string:
         fn = FidType.objects.get(name=fn).fiducial_number
     obj_name = FidType.objects.get(fiducial_number=fn).model_type
     Model = apps.get_model(app_label="iisc", model_name=obj_name)
@@ -35,8 +35,8 @@ def GetObjectFromFiducial(request, fn):
 
 
 @csrf_exempt
-def rate(request,user_id,fn,rating):
-    if isinstance(fn, unicode):
+def rate(request,user_id,fn,rating, string=False):
+    if string:
         fn = FidType.objects.get(name=fn).fiducial_number
     try:
         r = Rating.objects.get(person__pk=user_id, fiducial__fiducial_number=fn)
@@ -48,7 +48,7 @@ def rate(request,user_id,fn,rating):
                                   fiducial=FidType.objects.get(fiducial_number=fn),
                                   rating=rating)
         r.save()
-    return HttpResponse(json.dumps({'success':'True'}), content_type="application/json")
+    return HttpResponse(json.dumps({'success':'True', 'total_rating':FidType.objects.get(fiducial_number=fn).rating()}), content_type="application/json")
 
 @csrf_exempt
 def register(request):
@@ -64,8 +64,8 @@ def register(request):
         return HttpResponse(json.dumps({'success': 'True','UserID':p.pk}), content_type="application/json")
 
 
-def save_fid(request,user_id, fn):
-    if isinstance(fn, unicode):
+def save_fid(request,user_id, fn, string=False):
+    if string:
         fn = FidType.objects.get(name=fn).fiducial_number
     user = Participant.objects.get(pk=user_id)
     user.saved.add(FidType.objects.get(fiducial_number=fn))

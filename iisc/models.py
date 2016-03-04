@@ -15,6 +15,13 @@ class FidType(models.Model):
 
     def __unicode__(self):
         return unicode(self.fiducial_number)
+    
+    def rating(self):
+        ratings = Rating.objects.filter(fiducial__fiducial_number=self.fiducial_number)
+        if ratings:
+            return sum([r.rating for r in ratings])/len(ratings)
+        else:
+            return 0
 
 
 class FiducialObject(models.Model):
