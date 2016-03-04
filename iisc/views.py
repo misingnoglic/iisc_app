@@ -1,4 +1,4 @@
-from .models import Professor, FidType, Rating, Participant, FiducialObject
+from .models import Professor, FidType, Rating, Participant, FiducialObject, Lab
 from rest_framework import viewsets
 from .serializers import ProfessorSerializer
 from django.core import serializers
@@ -37,7 +37,12 @@ def GetObjectFromFiducial(request, fn, string=False):
 @csrf_exempt
 def rate(request,user_id,fn,rating, string=False):
     if string:
-        fn = FidType.objects.get(name=fn).fiducial_number
+        try:
+            fn = FidType.objects.get(name=fn).fiducial_number
+        except:
+            e = Lab.objects.create(name=fn, fiducial_number=fn.__hash__(), room=1)
+            e.save()
+            fn=e.fiducial_number
     try:
         r = Rating.objects.get(person__pk=user_id, fiducial__fiducial_number=fn)
         r.rating = rating
