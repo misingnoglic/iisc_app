@@ -15,7 +15,7 @@ class FidType(models.Model):
 
     def __unicode__(self):
         if self.name:
-            unicode(self.name)
+            return unicode(self.name)
         else:
             return unicode(self.fiducial_number)
     
