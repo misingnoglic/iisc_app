@@ -14,7 +14,10 @@ class FidType(models.Model):
     model_type = models.CharField(max_length=50)
 
     def __unicode__(self):
-        return unicode(self.fiducial_number)
+        if self.name:
+            unicode(self.name)
+        else:
+            return unicode(self.fiducial_number)
     
     def rating(self):
         ratings = Rating.objects.filter(fiducial__fiducial_number=self.fiducial_number)
