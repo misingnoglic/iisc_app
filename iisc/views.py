@@ -40,7 +40,7 @@ def rate(request,user_id,fn,rating, string=False):
         try:
             fn = FidType.objects.get(name=fn).fiducial_number
         except:
-            e = Lab.objects.create(name=fn, fiducial_number=fn.__hash__(), room=1)
+            e = Lab.objects.create(name=fn, fiducial_number=fn.__hash__()%2000000, room=1)
             e.save()
             fn=e.fiducial_number
     try:
